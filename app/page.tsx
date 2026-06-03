@@ -1,65 +1,51 @@
-import Image from "next/image";
+import Link from "next/link";
+import PageBackground from "@/components/PageBackground";
 
-export default function Home() {
+export default function LandingPage() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
+    <>
+      <PageBackground variant="vivid" />
+
+      {/* Navbar */}
+      <nav className="relative z-10 flex items-center justify-between px-12 py-4">
+        <div className="font-serif text-lg font-bold text-sugar-mauve">糖衣記憶 🍭</div>
+        <div className="flex gap-7">
+          <a className="text-[13px] text-sugar-lilac transition-colors hover:text-sugar-plum" href="#">
+            行動特點
           </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
+          <a className="text-[13px] text-sugar-lilac transition-colors hover:text-sugar-plum" href="#">
+            心靈聲音就是
+          </a>
+          <a className="text-[13px] text-sugar-lilac transition-colors hover:text-sugar-plum" href="#">
+            關於我們
           </a>
         </div>
+      </nav>
+
+      {/* Hero */}
+      <main className="relative z-10 flex min-h-[calc(100vh-64px)] flex-col items-center justify-center px-6 text-center">
+        <h1 className="mb-5 font-serif text-5xl font-bold leading-[1.3] tracking-[0.02em] text-sugar-ink">
+          把日常的酸澀，都裹上溫柔的糖衣。
+        </h1>
+
+        <p className="mb-3 max-w-[480px] text-[15px] leading-[1.8] text-sugar-mauve">
+          糖衣記憶（Glazed Memories）讓一切都從頭來過是我們的初衷，
+          <br />
+          用情感與文字描繪，讓 AI 知道你的日記並給你心靈上的甜蜜小提示。
+        </p>
+
+        <p className="mb-9 text-[13px] text-sugar-fade">
+          探索你的糖衣記憶，讓每一天都充滿甜蜜的回憶。
+        </p>
+
+        <Link href="/faceid" className="btn-cta">
+          探索你的糖衣記憶 · Start 立即登入
+        </Link>
+
+        <p className="fixed bottom-5 left-1/2 -translate-x-1/2 whitespace-nowrap text-[11px] text-sugar-mist">
+          © 2025 SugarMemory · 糖衣記憶 保留所有權利
+        </p>
       </main>
-    </div>
+    </>
   );
 }

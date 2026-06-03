@@ -1,26 +1,95 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: #fff0f3;
+  min-height: 100vh;
 }
+
+/* ─────────────────────────────────────────────
+   共用：背景漸層 (PageBackground 元件使用)
+   variant 預設為登入/首頁的飽和版；
+   .page-bg--soft 為儀表板的淡粉版
+───────────────────────────────────────────── */
+.page-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 50%, #ffaec4 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 30%, #c9b8ff 0%, transparent 55%),
+    radial-gradient(ellipse 50% 60% at 60% 80%, #b8e8d0 0%, transparent 50%),
+    radial-gradient(ellipse 40% 40% at 90% 70%, #ffd6a0 0%, transparent 50%),
+    linear-gradient(160deg, #ffe0ec 0%, #fff5f8 40%, #f8f0ff 70%, #fff8f0 100%);
+}
+.page-bg--soft {
+  background:
+    radial-gradient(ellipse 70% 50% at 25% 30%, #ffd6e4 0%, transparent 55%),
+    radial-gradient(ellipse 50% 40% at 80% 70%, #e8d8ff 0%, transparent 50%),
+    linear-gradient(160deg, #fff5f8 0%, #fff8fa 50%, #f8f0ff 100%);
+}
+
+/* ── 散景光暈 ── */
+.bokeh {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(60px);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  z-index: 0;
+}
+
+/* ── 馬卡龍漂浮動畫 ── */
+@keyframes floatA {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+@keyframes floatB {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+@keyframes floatC {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-15px); }
+}
+.float-a { animation: floatA 4.5s ease-in-out infinite; }
+.float-b { animation: floatB 6s ease-in-out infinite 0.5s; }
+.float-c { animation: floatC 5s ease-in-out infinite 1s; }
+
+/* ── CTA 主按鈕 ── */
+.btn-cta {
+  display: inline-block;
+  background: linear-gradient(135deg, #ff8fab 0%, #ff6b9d 50%, #e85d9a 100%);
+  color: white;
+  border: none;
+  cursor: pointer;
+  padding: 14px 36px;
+  border-radius: 9999px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: inherit;
+  box-shadow: 0 8px 28px rgba(255, 107, 157, 0.45), 0 2px 8px rgba(255, 107, 157, 0.3);
+  transition: all 0.2s;
+  letter-spacing: 0.02em;
+}
+.btn-cta:hover { filter: brightness(1.06); transform: translateY(-1px); }
+.btn-cta:active { transform: scale(0.97); }
+
+/* ── 通用膠囊按鈕 ── */
+.btn-pill {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 143, 171, 0.4);
+  color: #7b4f7a;
+  padding: 10px 24px;
+  border-radius: 9999px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-pill:hover { background: rgba(255, 255, 255, 0.85); }
