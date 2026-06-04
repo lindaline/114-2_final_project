@@ -15,21 +15,25 @@ type Diary = {
   color: string;
 };
 
-const PALETTE = ["#FFB3C6", "#C9B8FF", "#B8E8D0", "#FFD6A0", "#FF8FAB"];
-
-// 範例資料（純前端，重整會回到初始狀態）
-const SAMPLE: Diary[] = [
-  { id: 1, date: "2026-05-20", title: "週末的草莓鬆餅", body: "今天我一個人跑去了附近新開的咖啡廳，點了一份草莓鬆餅，奶油在嘴裡化開的瞬間覺得一切都值得了。", color: "#FFB3C6" },
-  { id: 2, date: "2026-05-20", title: "傍晚的小確幸", body: "回家路上買了一束小雛菊，插在窗邊。", color: "#FFD6A0" },
-  { id: 3, date: "2026-05-18", title: "雨後的傍晚散步", body: "和一隻流浪貓相遇，它的眼睛像是裝了整個傍晚。", color: "#C9B8FF" },
-  { id: 4, date: "2026-05-15", title: "想念遠方的朋友", body: "翻到以前的合照，忽然好想念那些一起熬夜聊天的日子。", color: "#B8E8D0" },
-  { id: 5, date: "2026-05-12", title: "那一天的蛋糕", body: "我一個、一個的把每個故事唱出來，走到最後才發現自己已經笑著哭了。", color: "#FFD6A0" },
-];
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:8000";
 
 export default function DashboardPage() {
-  const [diaries, setDiaries] = useState<Diary[]>(SAMPLE);
+  const router = useRouter();
+  const [diaries, setDiaries] = useState<Diary[]>([]);
   const [selectedDate, setSelectedDate] = useState(() => toKey(new Date()));
   const [editor, setEditor] = useState<EditorTarget | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // 從後端載入全部日記
+  async function loadDiaries() {
+    const res = await fetch(`${API_BASE}/api/diaries`);
+    if (res.ok) setDiaries(await res.json());
+  }
+
+  useEffect(() => {
+    loadDiaries();
+  }, []);
 
   const markedDates = useMemo(() => new Set(diaries.map((d) => d.date)), [diaries]);
   const dayList = useMemo(
@@ -37,31 +41,28 @@ export default function DashboardPage() {
     [diaries, selectedDate]
   );
 
-  function handleSave(values: { title: string; body: string }) {
+  async function handleSave(values: { title: string; body: string }) {
     if (!editor) return;
     if (editor.mode === "create") {
-      setDiaries((prev) => [
-        ...prev,
-        {
-          id: Date.now(),
-          date: editor.date,
-          title: values.title,
-          body: values.body,
-          color: PALETTE[prev.length % PALETTE.length],
-        },
-      ]);
+      await fetch(`${API_BASE}/api/diaries`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ date: editor.date, ...values }),
+      });
     } else {
-      setDiaries((prev) =>
-        prev.map((d) =>
-          d.id === editor.id ? { ...d, title: values.title, body: values.body } : d
-        )
-      );
+      await fetch(`${API_BASE}/api/diaries/${editor.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
     }
     setEditor(null);
+    await loadDiaries();
   }
 
-  function handleDelete(id: number) {
-    setDiaries((prev) => prev.filter((d) => d.id !== id));
+  async function handleDelete(id: number) {
+    await fetch(`${API_BASE}/api/diaries/${id}`, { method: "DELETE" });
+    await loadDiaries();
   }
 
   // 把 2025-05-20 顯示成 5 月 20 日
@@ -69,10 +70,7 @@ export default function DashboardPage() {
     const [, m, d] = selectedDate.split("-");
     return `${Number(m)} 月 ${Number(d)} 日`;
   })();
-
-  const router = useRouter();
-  const [menuOpen, setMenuOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
+  
 
   // 點選單以外的地方就關閉
   useEffect(() => {
@@ -108,7 +106,7 @@ export default function DashboardPage() {
           <div className="nav-welcome">歡迎回來，家菱！</div>
           <div className="avatar-wrap" ref={menuRef}>
           <button className="nav-avatar" onClick={() => setMenuOpen((v) => !v)} aria-label="帳號選單">
-            👤
+            <img src="/ling.jpg" alt="頭像" className="avatar-img" />
           </button>
           {menuOpen && (
             <div className="avatar-menu">
@@ -194,13 +192,24 @@ export default function DashboardPage() {
         .nav-welcome { font-size: 13px; color: #b08ab0; }
         .avatar-wrap { position: relative; }
         .nav-avatar {
-          width: 32px; height: 32px; border-radius: 50%;
-          background: linear-gradient(135deg, #ffb3c6, #ff8fab);
-          display: flex; align-items: center; justify-content: center;
-          font-size: 14px; border: none; cursor: pointer; padding: 0;
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          overflow: hidden;          /* 把超出圓形的圖切掉 */
+          padding: 0;
+          border: none;
+          cursor: pointer;
+          display: flex;             /* 讓裡面的圖填滿、不留縫 */
           transition: transform 0.15s;
         }
         .nav-avatar:hover { transform: scale(1.06); }
+
+        .avatar-img {
+          width: 100%;               /* 跟著按鈕大小 */
+          height: 100%;
+          object-fit: cover;         /* 自動縮放並裁切到剛好填滿,不變形 */
+          display: block;
+        }
         .avatar-menu {
           position: absolute; top: 40px; right: 0; z-index: 30;
           min-width: 120px;

@@ -1,0 +1,16 @@
+services:
+  db:
+    image: postgres:18
+    container_name: sugar-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: sugar_memory
+    ports:
+      - "5432:5432"
+    volumes:
+      - sugar_pgdata:/var/lib/postgresql      # ← 18 版：去掉結尾的 /data
+
+volumes:
+  sugar_pgdata:

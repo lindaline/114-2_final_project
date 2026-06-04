@@ -11,9 +11,19 @@ export default function LoginPage() {
   const [account, setAccount] = useState("");
   const [password, setPassword] = useState("");
 
-  function handleSubmit() {
-    // TODO: 接上真正的驗證 API
-    router.push("/dashboard");
+  const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:8000";
+
+  async function handleSubmit() {
+    const res = await fetch(`${API_BASE}/api/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username: account, password }),
+    });
+    if (res.ok) {
+      router.push("/dashboard");      // 成功 → 進儀表板
+    } else {
+      alert("帳號或密碼錯誤");          // 失敗 → 提示
+    }
   }
 
   return (
@@ -58,9 +68,6 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-            <button type="button" className="eye-btn" onClick={() => setShowPw((v) => !v)}>
-              {showPw ? "🙈" : "👁️"}
-            </button>
           </div>
 
           <button className="btn-submit mt-1.5" onClick={handleSubmit}>

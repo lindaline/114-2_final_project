@@ -69,11 +69,13 @@ export default function Calendar({
           const isSelected = key === selected;
           const isToday = key === todayKey;
           const hasDiary = markedDates.has(key);
+          const isFuture = key > todayKey;
           return (
             <button
               key={key}
-              className={`cal-day${isSelected ? " is-selected" : ""}${isToday ? " is-today" : ""}`}
-              onClick={() => onSelect(key)}
+              className={`cal-day${isSelected ? " is-selected" : ""}${isToday ? " is-today" : ""}${isFuture ? " is-disabled" : ""}`}
+              onClick={() => !isFuture && onSelect(key)}
+              disabled={isFuture}
             >
               <span>{d}</span>
               {hasDiary && <span className="cal-dot" />}
@@ -170,6 +172,13 @@ export default function Calendar({
         }
         .cal-day.is-selected .cal-dot {
           background: white;
+        }
+        .cal-day.is-disabled {
+          color: #d8c4d4;
+          cursor: not-allowed;
+        }
+        .cal-day.is-disabled:hover {
+          background: transparent;
         }
       `}</style>
     </div>
