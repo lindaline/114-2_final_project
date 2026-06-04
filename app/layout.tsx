@@ -28,7 +28,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="zh-TW" className={`${notoSerif.variable} ${notoSans.variable}`}>
-      <body className="font-sans" style={{ overflowX: "hidden" }}>
+      <body className="font-sans">
         {children}
       </body>
     </html>
