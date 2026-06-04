@@ -1,12 +1,37 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import PageBackground from "@/components/PageBackground";
 
 export default function FaceIdPage() {
   const router = useRouter();
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [camError, setCamError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let stream: MediaStream | null = null;
+
+    async function startCamera() {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "user" }, // 前鏡頭
+          audio: false,
+        });
+        if (videoRef.current) videoRef.current.srcObject = stream;
+      } catch {
+        setCamError("無法開啟鏡頭，請確認已允許瀏覽器的相機權限。");
+      }
+    }
+
+    startCamera();
+
+    // 離開頁面時關閉鏡頭，避免相機燈一直亮著
+    return () => {
+      stream?.getTracks().forEach((t) => t.stop());
+    };
+  }, []);
 
   // 模擬辨識完成後自動進入登入頁（可改成導向 /dashboard）
   useEffect(() => {
@@ -28,7 +53,7 @@ export default function FaceIdPage() {
 
       <main className="relative z-10 flex min-h-screen flex-col items-center justify-center px-6 text-center">
         <h1 className="mb-1.5 font-serif text-[26px] font-bold text-sugar-ink">
-          糖衣記憶 × Glazed Memories
+          糖衣記憶 × Sugar Memories
         </h1>
         <p className="mb-9 text-[13px] text-sugar-lilac">
           將臉部對準圓框，系統自動辨識，享受無密碼的甜蜜體驗。
@@ -38,6 +63,7 @@ export default function FaceIdPage() {
         <div className="macaron-outer">
           <div className="macaron-cream" />
           <div className="cam-inner">
+            <video ref={videoRef} className="cam-video" autoPlay playsInline muted />
             <svg width="90" height="90" viewBox="0 0 90 90" fill="none">
               <circle cx="45" cy="36" r="22" stroke="#98FB98" strokeWidth="1.8" opacity="0.6" />
               <circle cx="38" cy="33" r="3.2" fill="#B8E8D0" opacity="0.9" />
@@ -51,10 +77,13 @@ export default function FaceIdPage() {
 
         <div className="lock-badge">🔒</div>
 
-        <p className="mt-5 text-sm font-medium text-[#6B9E8B]">正在進行 Face ID 驗證中…</p>
+        <p className="mt-5 text-sm font-medium text-[#6B9E8B]">正在進行臉部驗證中…</p>
+        {camError && (
+          <p style={{ fontSize: 13, color: "#E2574C", marginTop: 8 }}>{camError}</p>
+        )}
 
         <Link href="/login" className="btn-pill mt-5">
-          相對 / 返回登入頁面 ♂
+          使用密碼登入🗝️
         </Link>
       </main>
 
@@ -131,6 +160,14 @@ export default function FaceIdPage() {
           justify-content: center;
           font-size: 22px;
           margin: 20px auto 0;
+        }
+        .cam-video {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          transform: scaleX(-1);  /* 水平鏡像，照起來像鏡子 */
         }
       `}</style>
     </>

@@ -31,7 +31,7 @@ export default function LoginPage() {
 
       <main className="relative z-10 flex min-h-screen flex-col items-center justify-center px-6 text-center">
         <h1 className="mb-1.5 font-serif text-[26px] font-bold text-sugar-ink">
-          糖衣記憶 × Glazed Memories
+          糖衣記憶 × Sugar Memories
         </h1>
         <p className="mb-7 text-[13px] text-sugar-lilac">
           請輸入您的帳號密碼，開始今日的甜蜜記憶之旅

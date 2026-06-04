@@ -1,9 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import PageBackground from "@/components/PageBackground";
-import Calendar from "@/components/Calendar";
+import Calendar, { toKey } from "@/components/Calendar";
 import DiaryEditorModal, { EditorTarget } from "@/components/DiaryEditorModal";
+
 
 type Diary = {
   id: number;
@@ -17,16 +19,16 @@ const PALETTE = ["#FFB3C6", "#C9B8FF", "#B8E8D0", "#FFD6A0", "#FF8FAB"];
 
 // 範例資料（純前端，重整會回到初始狀態）
 const SAMPLE: Diary[] = [
-  { id: 1, date: "2025-05-20", title: "週末的草莓鬆餅", body: "今天我一個人跑去了附近新開的咖啡廳，點了一份草莓鬆餅，奶油在嘴裡化開的瞬間覺得一切都值得了。", color: "#FFB3C6" },
-  { id: 2, date: "2025-05-20", title: "傍晚的小確幸", body: "回家路上買了一束小雛菊，插在窗邊。", color: "#FFD6A0" },
-  { id: 3, date: "2025-05-18", title: "雨後的傍晚散步", body: "和一隻流浪貓相遇，它的眼睛像是裝了整個傍晚。", color: "#C9B8FF" },
-  { id: 4, date: "2025-05-15", title: "想念遠方的朋友", body: "翻到以前的合照，忽然好想念那些一起熬夜聊天的日子。", color: "#B8E8D0" },
-  { id: 5, date: "2025-05-12", title: "那一天的蛋糕", body: "我一個、一個的把每個故事唱出來，走到最後才發現自己已經笑著哭了。", color: "#FFD6A0" },
+  { id: 1, date: "2026-05-20", title: "週末的草莓鬆餅", body: "今天我一個人跑去了附近新開的咖啡廳，點了一份草莓鬆餅，奶油在嘴裡化開的瞬間覺得一切都值得了。", color: "#FFB3C6" },
+  { id: 2, date: "2026-05-20", title: "傍晚的小確幸", body: "回家路上買了一束小雛菊，插在窗邊。", color: "#FFD6A0" },
+  { id: 3, date: "2026-05-18", title: "雨後的傍晚散步", body: "和一隻流浪貓相遇，它的眼睛像是裝了整個傍晚。", color: "#C9B8FF" },
+  { id: 4, date: "2026-05-15", title: "想念遠方的朋友", body: "翻到以前的合照，忽然好想念那些一起熬夜聊天的日子。", color: "#B8E8D0" },
+  { id: 5, date: "2026-05-12", title: "那一天的蛋糕", body: "我一個、一個的把每個故事唱出來，走到最後才發現自己已經笑著哭了。", color: "#FFD6A0" },
 ];
 
 export default function DashboardPage() {
   const [diaries, setDiaries] = useState<Diary[]>(SAMPLE);
-  const [selectedDate, setSelectedDate] = useState("2025-05-20");
+  const [selectedDate, setSelectedDate] = useState(() => toKey(new Date()));
   const [editor, setEditor] = useState<EditorTarget | null>(null);
 
   const markedDates = useMemo(() => new Set(diaries.map((d) => d.date)), [diaries]);
@@ -68,6 +70,26 @@ export default function DashboardPage() {
     return `${Number(m)} 月 ${Number(d)} 日`;
   })();
 
+  const router = useRouter();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // 點選單以外的地方就關閉
+  useEffect(() => {
+    function onClickOutside(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", onClickOutside);
+    return () => document.removeEventListener("mousedown", onClickOutside);
+  }, []);
+
+  function handleLogout() {
+    setMenuOpen(false);
+    router.push("/"); // 要改成回登入頁就換成 "/login"
+  }
+
   return (
     <>
       <PageBackground
@@ -84,12 +106,23 @@ export default function DashboardPage() {
         <div className="nav-logo">糖衣記憶 🍭</div>
         <div className="nav-right">
           <div className="nav-welcome">歡迎回來，家菱！</div>
-          <div className="nav-avatar">👤</div>
+          <div className="avatar-wrap" ref={menuRef}>
+          <button className="nav-avatar" onClick={() => setMenuOpen((v) => !v)} aria-label="帳號選單">
+            👤
+          </button>
+          {menuOpen && (
+            <div className="avatar-menu">
+              <button className="menu-item" onClick={handleLogout}>
+                登出
+              </button>
+            </div>
+          )}
+        </div>
         </div>
       </nav>
 
       {/* Content grid */}
-      <div className="relative z-10 mx-auto grid max-w-[1100px] grid-cols-1 gap-6 px-8 pb-12 pt-6 md:grid-cols-2">
+      <div className="relative z-10 mx-auto grid w-[100%] grid-cols-1 gap-6 px-8 pb-12 pt-6 md:grid-cols-2">
         {/* Left: Calendar */}
         <div>
           <div className="section-header">回憶月曆 📅</div>
@@ -159,11 +192,37 @@ export default function DashboardPage() {
         }
         .nav-right { display: flex; align-items: center; gap: 16px; font-size: 13px; color: #9b6fa0; }
         .nav-welcome { font-size: 13px; color: #b08ab0; }
+        .avatar-wrap { position: relative; }
         .nav-avatar {
           width: 32px; height: 32px; border-radius: 50%;
           background: linear-gradient(135deg, #ffb3c6, #ff8fab);
-          display: flex; align-items: center; justify-content: center; font-size: 14px;
+          display: flex; align-items: center; justify-content: center;
+          font-size: 14px; border: none; cursor: pointer; padding: 0;
+          transition: transform 0.15s;
         }
+        .nav-avatar:hover { transform: scale(1.06); }
+        .avatar-menu {
+          position: absolute; top: 40px; right: 0; z-index: 30;
+          min-width: 120px;
+          background: rgba(255, 255, 255, 0.95);
+          backdrop-filter: blur(12px);
+          border: 1px solid rgba(255, 183, 210, 0.4);
+          border-radius: 12px; padding: 6px;
+          box-shadow: 0 12px 32px rgba(255, 143, 171, 0.2);
+          animation: menuIn 0.16s ease-out;
+        }
+        @keyframes menuIn {
+          from { opacity: 0; transform: translateY(-4px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .menu-item {
+          width: 100%; text-align: left;
+          background: none; border: none; cursor: pointer;
+          padding: 8px 12px; border-radius: 8px;
+          font-family: inherit; font-size: 13px; color: #7b4f7a;
+          transition: background 0.15s;
+        }
+        .menu-item:hover { background: rgba(255, 143, 171, 0.14); }
         .section-header {
           display: flex; align-items: center; gap: 6px;
           font-size: 15px; font-weight: 700; color: #5c3a6e;
