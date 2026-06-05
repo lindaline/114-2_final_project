@@ -17,13 +17,13 @@ export default function LandingPage() {
           生活偶爾微酸，但這裡只留微甜。
         </h1>
 
-        <p className="mb-3 min-w-[480px] text-[15px] leading-[1.8] text-[#8C7376]">
+        <p className="mb-3 w-fit max-w-[600px] text-center text-[15px] leading-[1.8] text-[#8C7376]">
           卸下外面的防備，走進這個專屬的角落，用情感落筆，用文字呼吸。
           <br />
           把那些無處安放的委屈，或是閃閃發光的小確幸，都裹上一層溫柔的粉嫩色澤。
         </p>
 
-        <Link href="/faceid" className="btn-cta">
+        <Link href="/login" className="btn-cta">
           探索你的糖衣記憶 · 立即登入
         </Link>
 

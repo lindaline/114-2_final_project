@@ -15,34 +15,34 @@ from auth import User, verify_password, seed_users
 PALETTE = ["#FFB3C6", "#C9B8FF", "#B8E8D0", "#FFD6A0", "#FF8FAB"]
 
 
-# def seed() -> None:
-#     """資料庫為空時放入範例資料（以當月為基準，前端月曆才看得到點點）。"""
-#     db = SessionLocal()
-#     try:
-#         total = db.scalar(select(func.count()).select_from(models.Diary))
-#         if total and total > 0:
-#             return
-#         today = DateType.today()
-#         y, m = today.year, today.month
-#         samples = [
-#             (today, "今天的開始", "新的一天，先寫下第一筆甜甜的記憶。"),
-#             (today, "傍晚的小確幸", "回家路上買了一束小雛菊，插在窗邊。"),
-#             (DateType(y, m, 5), "週末的草莓鬆餅", "奶油在嘴裡化開的瞬間覺得一切都值得了。"),
-#             (DateType(y, m, 12), "雨後的傍晚散步", "和一隻流浪貓相遇，它的眼睛像是裝了整個傍晚。"),
-#             (DateType(y, m, 18), "想念遠方的朋友", "翻到以前的合照，忽然好想念那些日子。"),
-#         ]
-#         for i, (d, title, body) in enumerate(samples):
-#             db.add(models.Diary(date=d, title=title, body=body, color=PALETTE[i % len(PALETTE)]))
-#         db.commit()
-#     finally:
-#         db.close()
+def seed() -> None:
+    """資料庫為空時放入範例資料（以當月為基準，前端月曆才看得到點點）。"""
+    db = SessionLocal()
+    try:
+        total = db.scalar(select(func.count()).select_from(models.Diary))
+        if total and total > 0:
+            return
+        today = DateType.today()
+        y, m = today.year, today.month
+        samples = [
+            (today, "今天的開始", "新的一天，先寫下第一筆甜甜的記憶。"),
+            (today, "傍晚的小確幸", "回家路上買了一束小雛菊，插在窗邊。"),
+            (DateType(y, m, 5), "週末的草莓鬆餅", "奶油在嘴裡化開的瞬間覺得一切都值得了。"),
+            (DateType(y, m, 12), "雨後的傍晚散步", "和一隻流浪貓相遇，它的眼睛像是裝了整個傍晚。"),
+            (DateType(y, m, 18), "想念遠方的朋友", "翻到以前的合照，忽然好想念那些日子。"),
+        ]
+        for i, (d, title, body) in enumerate(samples):
+            db.add(models.Diary(date=d, title=title, body=body, color=PALETTE[i % len(PALETTE)]))
+        db.commit()
+    finally:
+        db.close()
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # 啟動時建表 + 灌範例資料
     Base.metadata.create_all(bind=engine)
-    # seed()
+    seed()
     seed_users()
     yield
 
