@@ -131,6 +131,7 @@ def delete_diary(diary_id: int, db: Session = Depends(get_db)):
     db.commit()
     return {"ok": True}
 
+# 登入
 @app.post("/api/login", response_model=schemas.LoginResponse)
 def login(payload: schemas.LoginRequest, db: Session = Depends(get_db)):
     user = db.scalar(select(User).where(User.username == payload.username))

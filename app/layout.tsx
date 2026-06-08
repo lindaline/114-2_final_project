@@ -17,7 +17,7 @@ const notoSans = Noto_Sans_TC({
 });
 
 export const metadata: Metadata = {
-  title: "糖衣記憶 — Glazed Memories",
+  title: "糖衣記憶 — Sugar Memories",
   description: "把日常的酸澀，都裹上溫柔的糖衣。",
 };
 
